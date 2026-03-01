@@ -131,7 +131,7 @@ validate_inputs() {
     fi
 
     if [[ ! -d "$TARGET_DIR" ]]; then
-        error_json "Target directory does not exist: $TARGET_DIR" 3
+        error_json "Target directory does not exist: $TARGET_DIR" 1
     fi
 
     TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"

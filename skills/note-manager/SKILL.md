@@ -12,13 +12,6 @@ version: 1.0.0
 
 Create and manage markdown notes with YAML frontmatter in an Obsidian vault. Provides a minimal, standardized approach to note creation that lets Obsidian handle linking, indexing, and rendering while ensuring consistent metadata across all cogni-x plugin outputs.
 
-## When to Use
-
-- Creating new markdown notes in a workplace vault
-- Adding YAML frontmatter to notes for organization
-- Any cogni-x plugin needs to write structured output to the vault
-- User wants notes with consistent metadata (date, tags, source plugin)
-
 ## Frontmatter Standard
 
 All notes created through this skill use this minimal frontmatter:

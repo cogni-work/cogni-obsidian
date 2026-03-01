@@ -1,6 +1,6 @@
 {
   "name": "cogni-obsidian",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Obsidian integration for Claude Code workplaces. Scaffolds Obsidian vaults with Terminal plugin integration, manages vault configuration, and provides note management with frontmatter support. Enables cogni-x plugins to work on projects collaboratively through an Obsidian-based workplace environment.",
   "author": {
     "name": "Stephan de Haas",

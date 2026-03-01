@@ -319,7 +319,7 @@ main() {
     done
 
     [[ -n "$workplace_dir" ]] || error_json "Usage: $0 <workplace-dir> [--dry-run]" 2
-    workplace_dir="$(cd "$workplace_dir" 2>/dev/null && pwd)" || error_json "Cannot access: ${1:-}" 1
+    workplace_dir="$(cd "$workplace_dir" 2>/dev/null && pwd)" || error_json "Cannot access: $workplace_dir" 1
 
     # Locate template from plugin root
     local template_dir="${PLUGIN_ROOT}/skills/setup-obsidian/templates/obsidian/plugins/terminal"

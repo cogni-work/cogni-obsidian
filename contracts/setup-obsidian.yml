@@ -28,6 +28,7 @@ interface:
         dry_run: "boolean - whether this was a preview"
         warnings: "array of strings - any warnings (e.g., existing .obsidian)"
       error: "string (if success=false)"
+      error_code: "number - numeric exit code (if success=false)"
       metadata:
         timestamp: "string - ISO 8601 UTC"
         script: "string - setup-obsidian.sh"

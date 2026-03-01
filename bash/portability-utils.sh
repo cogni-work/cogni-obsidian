@@ -15,14 +15,26 @@ set -euo pipefail
 #   portable_sed_i 's/old/new/g' "/path/to/file"
 #
 # Functions provided:
-#   portable_file_size  - Get file size in bytes
-#   portable_file_mtime - Get file modification time (Unix timestamp)
-#   portable_sed_i      - In-place sed replacement
-#   portable_mktemp     - Create temp file
-#   portable_mktemp_d   - Create temp directory
-#   portable_readlink   - Resolve symlinks to absolute path
-#   portable_date_iso   - Get current date in ISO format
-#   portable_realpath   - Get absolute path (resolving symlinks)
+#   portable_file_size      - Get file size in bytes
+#   portable_file_mtime     - Get file modification time (Unix timestamp)
+#   portable_sed_i          - In-place sed replacement
+#   portable_mktemp         - Create temp file
+#   portable_mktemp_d       - Create temp directory
+#   portable_realpath       - Get absolute path (resolving symlinks)
+#   portable_date_iso       - Get current date in ISO 8601 UTC format
+#   portable_date_ymd       - Get current date in YYYY-MM-DD format
+#   portable_base64_encode  - Base64 encode a string
+#   portable_md5            - Get MD5 hash of a string
+#   portable_sha256         - Get SHA-256 hash of a string
+#   portable_grep_p         - Grep with Perl regex support
+#   portable_lock_acquire   - Acquire a file lock with timeout
+#   portable_lock_release   - Release a file lock
+#   portable_wsl_path       - Convert Windows path to WSL /mnt/ format
+#   is_macos                - Check if running on macOS
+#   is_linux                - Check if running on Linux
+#   is_windows              - Check if running on Windows (Git Bash/MSYS/Cygwin)
+#   is_wsl                  - Check if running on WSL
+#   has_command              - Check if a command is available
 #
 # Platform detection:
 #   PORTABLE_PLATFORM - "darwin", "linux", or "windows"
@@ -154,8 +166,8 @@ portable_realpath() {
 
     case "$PORTABLE_PLATFORM" in
         darwin)
-            # macOS: Use Python for reliable resolution
-            python3 -c "import os; print(os.path.realpath('$path'))"
+            # macOS: Use Python for reliable resolution (path passed via sys.argv to avoid injection)
+            python3 -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$path"
             ;;
         linux|windows)
             readlink -f "$path"
@@ -163,7 +175,7 @@ portable_realpath() {
         *)
             # Fallback: try readlink -f, then Python
             readlink -f "$path" 2>/dev/null || \
-                python3 -c "import os; print(os.path.realpath('$path'))" 2>/dev/null || \
+                python3 -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$path" 2>/dev/null || \
                 echo "$path"
             ;;
     esac

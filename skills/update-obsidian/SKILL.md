@@ -13,14 +13,6 @@ version: 1.0.0
 
 Incrementally update Obsidian terminal configurations in existing workplaces. Merges new terminal profiles, copies new scripts, fixes WSL profile issues, removes deprecated profiles, and migrates paths — all while preserving user customizations.
 
-## When to Use
-
-- User's terminal profiles are outdated or broken
-- New terminal profiles need to be added to an existing workplace
-- WSL profile args need fixing (stale "--", missing PATH, missing useWin32Conhost)
-- Deprecated Git Bash profiles need cleanup
-- WORKPLACE_ROOT paths need migration from Windows to WSL format
-
 ## Workflow
 
 ### Step 1: Identify the Workplace

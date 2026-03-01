@@ -13,13 +13,6 @@ version: 1.0.0
 
 Scaffold a complete Obsidian vault integrated with Claude Code for a workplace directory. This creates the `.obsidian/` configuration with Terminal plugin profiles, the Claude Code launcher script, and all necessary configuration for cogni-x plugins to work collaboratively through an Obsidian-based environment.
 
-## When to Use
-
-- User wants to set up Obsidian for a workplace
-- User wants to create a new Claude Code workplace with Obsidian integration
-- User mentions Obsidian Terminal or launching Claude from Obsidian
-- A workplace directory exists but has no `.obsidian/` configuration
-
 ## Workflow
 
 ### Step 1: Understand the Target

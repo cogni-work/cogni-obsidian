@@ -24,7 +24,7 @@ show_header() {
     clear
     echo -e "${CYAN}╔════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║    ${BLUE}${BOLD}WORKPLACE${NC}${CYAN} with claude code          ║${NC}"
-    echo -e "${CYAN}║      ${MAGENTA}cogni-obsidian v0.1${CYAN}               ║${NC}"
+    echo -e "${CYAN}║      ${MAGENTA}cogni-obsidian v0.9.1${CYAN}             ║${NC}"
     echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
     echo
 }
