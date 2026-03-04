@@ -1,20 +1,19 @@
 ---
 name: note-manager
 description: >-
-  This skill should be used when the user asks to "create a note", "create markdown note",
-  "add frontmatter", "create a note with metadata", "write a note in my vault",
-  or when any cogni-x plugin needs to create properly formatted markdown files
-  with YAML frontmatter in an Obsidian vault.
-version: 1.0.0
+  Create properly formatted markdown notes with YAML frontmatter in an Obsidian vault. Use this
+  skill whenever the user asks to create a note, write a markdown file with metadata, add
+  frontmatter to a document, or save content to their vault. Also trigger when any cogni-x plugin
+  needs to produce output files that should be discoverable in Obsidian — the frontmatter standard
+  ensures consistent metadata across all plugin outputs.
+version: 1.1.0
 ---
 
 ## Purpose
 
-Create and manage markdown notes with YAML frontmatter in an Obsidian vault. Provides a minimal, standardized approach to note creation that lets Obsidian handle linking, indexing, and rendering while ensuring consistent metadata across all cogni-x plugin outputs.
+Provide a consistent way to create markdown notes that work well in Obsidian. Every note gets YAML frontmatter with at least a title and date, which makes it searchable, taggable, and visible in Obsidian's graph view. The approach is deliberately minimal — Obsidian handles linking, rendering, and indexing, so the notes just need to be well-structured standard markdown.
 
 ## Frontmatter Standard
-
-All notes created through this skill use this minimal frontmatter:
 
 ```yaml
 ---
@@ -22,33 +21,23 @@ title: "Note Title"
 date: 2026-03-01
 tags:
   - tag1
-  - tag2
 source: plugin-name
 ---
 ```
 
-### Required Fields
+**Required:** `title` (string) and `date` (YYYY-MM-DD).
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `title` | string | Human-readable title |
-| `date` | date (YYYY-MM-DD) | Creation date |
+**Optional:**
+- `tags` (list) — for Obsidian search and graph view
+- `source` (string) — which plugin created the note (e.g., "cogni-research", "cogni-narrative")
+- `status` (string) — workflow state: draft, review, or final
+- `related` (list) — paths to related notes
 
-### Optional Fields
+## Creating Notes
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `tags` | list | Obsidian tags for organization |
-| `source` | string | Plugin that created the note (e.g., "cogni-research", "cogni-narrative") |
-| `status` | string | Workflow status (draft, review, final) |
-| `related` | list | Paths to related notes |
+Use the Write tool. Always include frontmatter, even for simple notes.
 
-## Note Creation
-
-### Simple Note
-
-Create a markdown file with frontmatter using the Write tool:
-
+**Example — user note:**
 ```markdown
 ---
 title: "Meeting Notes - Q1 Review"
@@ -63,10 +52,7 @@ tags:
 Content goes here...
 ```
 
-### Plugin Output Note
-
-When a cogni-x plugin produces output, include the `source` field:
-
+**Example — plugin output:**
 ```markdown
 ---
 title: "Market Analysis - DACH Region"
@@ -74,7 +60,6 @@ date: 2026-03-01
 tags:
   - research
   - market-analysis
-  - dach
 source: cogni-research
 status: final
 ---
@@ -84,24 +69,17 @@ status: final
 Research findings...
 ```
 
-## File Naming Convention
+## File Naming and Placement
 
-Use kebab-case for filenames:
-- `meeting-notes-q1-review.md`
-- `market-analysis-dach.md`
-- `2026-03-01-daily-standup.md` (date-prefixed for daily notes)
+Use **kebab-case** filenames: `meeting-notes-q1-review.md`, `market-analysis-dach.md`. For daily notes, prefix with the date: `2026-03-01-daily-standup.md`.
 
-## Directory Placement
-
-Place notes according to the vault's folder structure:
+Place files according to vault structure:
 - Plugin output goes in the plugin's directory (e.g., `cogni-research/findings/`)
 - General notes go in the vault root or a user-specified folder
-- Daily notes follow Obsidian's daily notes path setting
+- Check for existing files before writing to avoid accidental overwrites
 
-## Guidelines
+## Key Rules
 
-1. **Keep it standard markdown** — Obsidian handles rendering, linking, and search
-2. **Always include frontmatter** — Even for simple notes, add title and date
-3. **Let Obsidian handle links** — Do not generate wikilinks or embed syntax; write standard markdown links
-4. **Respect existing structure** — Check for existing files before overwriting
-5. **Use tags for discoverability** — Tags help Obsidian's search and graph view
+1. **Standard markdown only** — no wikilinks or Obsidian-specific embed syntax; use regular markdown links
+2. **Always include frontmatter** — title and date at minimum, tags for discoverability
+3. **Respect existing structure** — read the vault layout before placing files

@@ -1,104 +1,75 @@
 ---
 name: setup-obsidian
 description: >-
-  This skill should be used when the user asks to "set up Obsidian", "create an Obsidian workplace",
-  "configure Obsidian vault", "scaffold Obsidian", "initialize Obsidian integration",
-  "set up my workplace", or mentions wanting to use Obsidian with Claude Code.
-  It scaffolds a complete .obsidian vault configuration with Terminal plugin integration,
-  enabling Claude Code sessions from within Obsidian.
-version: 1.0.0
+  Scaffold a complete Obsidian vault with Claude Code terminal integration for a workplace
+  directory. Use this skill whenever the user wants to set up Obsidian, create or configure an
+  Obsidian vault, connect Obsidian to Claude Code, scaffold a workplace environment, or mentions
+  wanting to use Obsidian as their writing/research/project workspace. Also trigger when the user
+  asks about integrating a terminal into Obsidian or launching Claude Code from within Obsidian,
+  even if they don't explicitly say "setup".
+version: 1.1.0
 ---
 
 ## Purpose
 
-Scaffold a complete Obsidian vault integrated with Claude Code for a workplace directory. This creates the `.obsidian/` configuration with Terminal plugin profiles, the Claude Code launcher script, and all necessary configuration for cogni-x plugins to work collaboratively through an Obsidian-based environment.
+Create a ready-to-use `.obsidian/` configuration inside a workplace directory so the user can open it in Obsidian and immediately launch Claude Code from the built-in Terminal plugin. The configuration includes a Tokyonight-themed terminal, a launcher script that handles language selection and permission modes, and sensible vault defaults (live preview, line numbers, file explorer, search, backlinks).
 
 ## Workflow
 
-### Step 1: Understand the Target
+### Step 1: Resolve the Target Directory
 
-Ask the user for the **workplace directory path** where Obsidian should be configured.
+The user may provide a path explicitly, or you may need to figure it out from context.
 
-If the user provides a path, validate it exists. If not, ask:
-- "Where is your workplace directory?"
-- Suggest the current working directory if it looks like a workplace (has `.workplace-env.sh` or `.workplace-config.json`)
+**Resolution order:**
+1. If the user gave a path, use it.
+2. If the current working directory contains `.workplace-env.sh` or `.workplace-config.json`, suggest it — these are markers of an existing workplace.
+3. Otherwise, ask: "Which directory should I set up as an Obsidian vault?"
 
-### Step 2: Pre-flight Checks
+### Step 2: Check for Existing Configuration
 
-Before running the setup script, verify:
+Check whether `<TARGET_DIR>/.obsidian/` already exists. If it does, **stop** — the setup script refuses to overwrite existing configurations. Tell the user their vault is already configured and suggest using `update-obsidian` instead, which handles incremental updates while preserving their customizations.
 
-1. **Target directory exists** — confirm the path is valid
-2. **No existing .obsidian** — if `.obsidian/` already exists, warn the user and suggest using `update-obsidian` instead
-3. **Dependencies available** — jq and curl must be installed
-
-### Step 3: Run Setup Script
-
-Execute the setup script to scaffold the Obsidian vault:
+### Step 3: Run the Setup Script
 
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-obsidian.sh" "<TARGET_DIR>"
 ```
 
-The script performs these operations:
-1. Copies `.obsidian/` template directory (app.json, appearance.json, core-plugins.json, community-plugins.json, workspace.json)
-2. Downloads Terminal plugin from GitHub (main.js, manifest.json, styles.css)
-3. Substitutes `{{WORKPLACE_ROOT}}` and `{{WORKPLACE_ROOT_WSL}}` placeholders with actual paths
-4. Sets platform-appropriate default terminal profile (workplace on macOS/Linux, workplace-wsl on Windows/WSL)
-5. Makes the orchestrator script executable
+The script copies template configs, downloads the Terminal plugin from GitHub, substitutes path placeholders, and sets the platform-appropriate default profile. It outputs JSON — check `success` in the response.
 
-Use `--dry-run` flag first if the user wants to preview changes.
+Add `--dry-run` if the user wants to preview what would happen first.
 
-### Step 4: Post-Setup Guidance
+**If the script fails**, check the JSON error:
+- Exit 1 (validation): the directory doesn't exist or copying failed — confirm the path
+- Exit 2 (args): missing target directory — ensure the path argument is passed
+- Exit 3 (dependency): `jq` or `curl` is missing — tell the user to install them
 
-After successful setup, inform the user:
+### Step 4: Guide the User
 
-1. **Open the workplace directory as an Obsidian vault** — File > Open Vault > select the workplace directory
-2. **Open Terminal** — Use the ribbon icon or Command Palette > "Terminal: Open terminal"
-3. **The "Workplace" profile launches Claude Code** — with language selection and permission mode options
-4. **Environment variables are sourced automatically** — `.workplace-env.sh` is loaded by the terminal profile
+After a successful run, tell the user how to get started:
 
-### Terminal Profiles Created
-
-| Profile | Platform | Purpose |
-|---------|----------|---------|
-| Workplace (Unix) | macOS, Linux | Launches Claude Code via orchestrator |
-| Workplace (WSL) | Windows | Launches Claude Code via wsl.exe |
+1. **Open in Obsidian** — File > Open Vault > navigate to the workplace directory
+2. **Launch the terminal** — Click the terminal icon in the left ribbon, or use Command Palette > "Terminal: Open terminal"
+3. **The "Workplace" profile starts Claude Code** — it will ask for language and permission mode, then launch Claude Code in the workplace context
+4. **Tip**: if the user has `.workplace-env.sh`, environment variables are sourced automatically when the terminal opens
 
 ### What Gets Created
 
 ```
 .obsidian/
-├── app.json                 # Vault settings (live preview, line numbers)
-├── appearance.json          # Theme (moonstone), font size
-├── core-plugins.json        # 15 enabled core plugins
-├── community-plugins.json   # Terminal plugin enabled
-├── workspace.json           # Multi-pane layout (editor, file explorer, search)
-└── plugins/
-    └── terminal/
-        ├── main.js          # Terminal plugin (downloaded from GitHub)
-        ├── manifest.json    # Plugin manifest
-        ├── styles.css       # Plugin styles
-        ├── data.json        # Terminal profiles with Tokyonight theme
-        └── workplace-orchestrator.sh  # Claude Code launcher
+├── app.json                 # Live preview, line numbers, link auto-update
+├── appearance.json          # Moonstone theme, 16px base font
+├── core-plugins.json        # 15 core plugins (explorer, search, graph, backlinks, etc.)
+├── community-plugins.json   # Terminal plugin
+├── workspace.json           # Default layout: editor + file explorer + search sidebar
+└── plugins/terminal/
+    ├── main.js              # Terminal plugin (downloaded from GitHub)
+    ├── manifest.json
+    ├── styles.css
+    ├── data.json             # Workplace profiles with Tokyonight terminal theme
+    └── workplace-orchestrator.sh  # Claude Code launcher script
 ```
 
-## Script Interface
+## Script Contract
 
-See contract at `${CLAUDE_PLUGIN_ROOT}/contracts/setup-obsidian.yml` for the complete interface specification.
-
-**Parameters:**
-- `TARGET_DIR` (required) — path to workspace directory
-- `--dry-run` (optional) — preview without changes
-
-**Output:** JSON with success/data/metadata structure
-
-**Exit codes:** 0=Success, 1=Validation failure, 2=Invalid args, 3=Template/dependency not found
-
-## Cross-Platform Support
-
-The setup handles three platforms:
-- **macOS (Darwin)** — Uses `/bin/bash`, SF Mono font, homebrew paths
-- **Linux** — Uses `/bin/bash`, standard paths
-- **Windows (WSL)** — Uses `wsl.exe`, Cascadia Code font, `useWin32Conhost: true`
-
-Path placeholders are substituted with both native and WSL formats to support all environments from a single template.
+Full interface: `${CLAUDE_PLUGIN_ROOT}/contracts/setup-obsidian.yml`
