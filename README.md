@@ -94,4 +94,4 @@ This plugin follows the cogni-x **convention-based zero-coupling** architecture:
 
 ## License
 
-CC-BY-NC-SA-4.0
+[AGPL-3.0](LICENSE)
